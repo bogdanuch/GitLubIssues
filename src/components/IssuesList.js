@@ -18,21 +18,20 @@ function IssuesList() {
     const [createdAfter, setCreatedAfter] = useState(undefined);
     const [updatedBefore, setUpdatedBefore] = useState(undefined);
     const [updatedAfter, setUpdatedAfter] = useState(undefined);
-    const [selectedPage, setSelectedPage] = useState(pageParams.currentPage);
-    const makeRequest = () =>{
-        requestIssues(selectedPage,issuesState, createdAfter, createdBefore, updatedAfter, updatedBefore).then((resp)=>{
+    const makeRequest = (page) =>{
+        requestIssues(page,issuesState, createdAfter, createdBefore, updatedAfter, updatedBefore).then((resp)=>{
                 dispatch(updateIssues(resp.data))
                 dispatch(updatePageParams(resp.pageParams))
         })
     }
     useEffect(()=>{
-        makeRequest();
-    },[selectedPage, issuesState, createdBefore, createdAfter, updatedAfter, updatedBefore])
+        makeRequest('1');
+    },[issuesState, createdBefore, createdAfter, updatedAfter, updatedBefore])
 
     return (
         <div className='issue-page'>
             <h1>Issues list</h1>
-            <PageSelector pageParams={pageParams} setNewPage={setSelectedPage}/>
+            <PageSelector pageParams={pageParams} setNewPage={makeRequest}/>
             <div className='filters'>
                 <Filter filterName='State' dataArray={issueStates} stateSetter={setIssuesState}/>
                 <Filter filterName='Created before' dataArray={timeVariables} stateSetter={setCreatedBefore}/>
@@ -47,7 +46,7 @@ function IssuesList() {
                     </div>
                 ))}
             </div>
-            <PageSelector pageParams={pageParams} setNewPage={setSelectedPage}/>
+            {issues.length>9 && <PageSelector pageParams={pageParams} setNewPage={makeRequest}/>}
         </div>
     );
 }
